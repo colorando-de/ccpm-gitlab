@@ -2,14 +2,14 @@
 
 [![Automaze](https://img.shields.io/badge/By-automaze.io-4b3baf)](https://automaze.io)
 &nbsp;
-[![Claude Code](https://img.shields.io/badge/+-Claude%20Code-d97757)](https://gitlab.com/your-org/ccpm-gitlab/blob/main/README.md)
-[![GitLab Issues](https://img.shields.io/badge/+-GitLab%20Issues-FC6D26)](https://gitlab.com/your-org/ccpm-gitlab)
+[![Claude Code](https://img.shields.io/badge/+-Claude%20Code-d97757)](https://github.com/colorando-de/ccpm-gitlab/blob/main/README.md)
+[![GitLab Issues](https://img.shields.io/badge/+-GitLab%20Issues-FC6D26)](https://github.com/colorando-de/ccpm-gitlab)
 &nbsp;
-[![MIT License](https://img.shields.io/badge/License-MIT-28a745)](https://gitlab.com/your-org/ccpm-gitlab/blob/main/LICENSE)
+[![MIT License](https://img.shields.io/badge/License-MIT-28a745)](https://github.com/colorando-de/ccpm-gitlab/blob/main/LICENSE)
 &nbsp;
 [![Follow on 𝕏](https://img.shields.io/badge/𝕏-@aroussi-1c9bf0)](http://x.com/intent/follow?screen_name=aroussi)
 &nbsp;
-[![Star this project](https://img.shields.io/badge/★-Star%20this%20project-e7b10b)](https://gitlab.com/your-org/ccpm-gitlab)
+[![Star this project](https://img.shields.io/badge/★-Star%20this%20project-e7b10b)](https://github.com/colorando-de/ccpm-gitlab)
 
 ### Claude Code workflow to ship ~~faster~~ _better_ using spec-driven development, GitLab issues, Git worktrees, and multiple AI agents running in parallel.
 
@@ -390,18 +390,18 @@ Teams using this system report:
 
    ```bash
    cd path/to/your/project/
-   curl -sSL https://gitlab.com/your-org/ccpm-gitlab/-/raw/main/install/ccpm.sh | bash
-   # or: wget -qO- https://gitlab.com/your-org/ccpm-gitlab/-/raw/main/install/ccpm.sh | bash
+   curl -sSL https://github.com/colorando-de/ccpm-gitlab/-/raw/main/install/ccpm.sh | bash
+   # or: wget -qO- https://github.com/colorando-de/ccpm-gitlab/-/raw/main/install/ccpm.sh | bash
    ```
 
    #### Windows (PowerShell)
    ```bash
    cd path/to/your/project/
-   iwr -useb https://gitlab.com/your-org/ccpm-gitlab/-/raw/main/install/ccpm.bat | iex
+   iwr -useb https://github.com/colorando-de/ccpm-gitlab/-/raw/main/install/ccpm.bat | iex
    ```
    > ⚠️ **IMPORTANT**: If you already have a `.claude` directory, clone this repository to a different directory and copy the contents of the cloned `.claude` directory to your project's `.claude` directory.
 
-   See full/other installation options in the [installation guide ›](https://gitlab.com/your-org/ccpm-gitlab/-/tree/main/install)
+   See full/other installation options in the [installation guide ›](https://github.com/colorando-de/ccpm-gitlab/-/tree/main/install)
 
 
 2. **Initialize the PM system**:
@@ -475,7 +475,7 @@ Claude Code PM was developed at [Automaze](https://automaze.io) **for developers
 
 If Claude Code PM helps your team ship better software:
 
-- ⭐ **[Star this project](https://gitlab.com/your-org/ccpm-gitlab)** to show your support
+- ⭐ **[Star this project](https://github.com/colorando-de/ccpm-gitlab)** to show your support
 - 🐦 **[Follow @aroussi on X](https://x.com/aroussi)** for updates and tips
 
 
