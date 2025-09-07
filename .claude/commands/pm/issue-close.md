@@ -4,7 +4,7 @@ allowed-tools: Bash, Read, Write, LS
 
 # Issue Close
 
-Mark an issue as complete and close it on GitHub.
+Mark an issue as complete and close it on GitLab.
 
 ## Usage
 ```
@@ -36,7 +36,7 @@ If progress file exists at `.claude/epics/{epic}/updates/$ARGUMENTS/progress.md`
 - Add completion note with timestamp
 - Update last_sync with current datetime
 
-### 4. Close on GitHub
+### 4. Close on GitLab
 
 Add completion comment and close:
 ```bash
@@ -46,13 +46,13 @@ echo "✅ Task completed
 $ARGUMENTS
 
 ---
-Closed at: {timestamp}" | gh issue comment $ARGUMENTS --body-file -
+Closed at: {timestamp}" | glab issue comment $ARGUMENTS --description-file -
 
 # Close the issue
-gh issue close $ARGUMENTS
+glab issue close $ARGUMENTS
 ```
 
-### 5. Update Epic Task List on GitHub
+### 5. Update Epic Task List on GitLab
 
 Check the task checkbox in the epic issue:
 
@@ -65,15 +65,15 @@ epic_issue=$(grep 'github:' .claude/epics/$epic_name/epic.md | grep -oE '[0-9]+$
 
 if [ ! -z "$epic_issue" ]; then
   # Get current epic body
-  gh issue view $epic_issue --json body -q .body > /tmp/epic-body.md
+  glab issue view $epic_issue --json body -q .body > /tmp/epic-body.md
   
   # Check off this task
   sed -i "s/- \[ \] #$ARGUMENTS/- [x] #$ARGUMENTS/" /tmp/epic-body.md
   
   # Update epic issue
-  gh issue edit $epic_issue --body-file /tmp/epic-body.md
+  glab issue edit $epic_issue --description-file /tmp/epic-body.md
   
-  echo "✓ Updated epic progress on GitHub"
+  echo "✓ Updated epic progress on GitLab"
 fi
 ```
 
@@ -89,7 +89,7 @@ fi
 ```
 ✅ Closed issue #$ARGUMENTS
   Local: Task marked complete
-  GitHub: Issue closed & epic updated
+  GitLab: Issue closed & epic updated
   Epic progress: {new_progress}% ({closed}/{total} tasks complete)
   
 Next: Run /pm:next for next priority task
@@ -98,5 +98,5 @@ Next: Run /pm:next for next priority task
 ## Important Notes
 
 Follow `/rules/frontmatter-operations.md` for updates.
-Follow `/rules/github-operations.md` for GitHub commands.
-Always sync local state before GitHub.
+Follow `/rules/gitlab-operations.md` for GitLab commands.
+Always sync local state before GitLab.

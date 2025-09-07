@@ -84,7 +84,7 @@ else
   echo "  ⏸️ Blocked: $blocked"
 
   [ -n "$github" ] && echo ""
-  [ -n "$github" ] && echo "🔗 GitHub: $github"
+  [ -n "$github" ] && echo "🔗 GitLab: $github"
 fi
 
 exit 0

@@ -29,9 +29,9 @@ progress = (closed_tasks / total_tasks) * 100
 
 Round to nearest integer.
 
-### 3. Update GitHub Task List
+### 3. Update GitLab Task List
 
-If epic has GitHub issue, sync task checkboxes:
+If epic has GitLab issue, sync task checkboxes:
 
 ```bash
 # Get epic issue number from epic.md frontmatter
@@ -39,7 +39,7 @@ epic_issue={extract_from_github_field}
 
 if [ ! -z "$epic_issue" ]; then
   # Get current epic body
-  gh issue view $epic_issue --json body -q .body > /tmp/epic-body.md
+  glab issue view $epic_issue --json body -q .body > /tmp/epic-body.md
   
   # For each task, check its status and update checkbox
   for task_file in .claude/epics/$ARGUMENTS/[0-9]*.md; do
@@ -56,7 +56,7 @@ if [ ! -z "$epic_issue" ]; then
   done
   
   # Update epic issue
-  gh issue edit $epic_issue --body-file /tmp/epic-body.md
+  glab issue edit $epic_issue --description-file /tmp/epic-body.md
 fi
 ```
 
@@ -89,7 +89,7 @@ Tasks:
   
 Progress: {old_progress}% → {new_progress}%
 Status: {old_status} → {new_status}
-GitHub: Task list updated ✓
+GitLab: Task list updated ✓
 
 {If complete}: Run /pm:epic-close $ARGUMENTS to close epic
 {If in progress}: Run /pm:next to see priority tasks
@@ -97,6 +97,6 @@ GitHub: Task list updated ✓
 
 ## Important Notes
 
-This is useful after manual task edits or GitHub sync.
+This is useful after manual task edits or GitLab sync.
 Don't modify task files, only epic status.
 Preserve all other frontmatter fields.

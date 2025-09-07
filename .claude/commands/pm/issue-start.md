@@ -4,7 +4,7 @@ allowed-tools: Bash, Read, Write, LS, Task
 
 # Issue Start
 
-Begin work on a GitHub issue with parallel agents based on work stream analysis.
+Begin work on a GitLab issue with parallel agents based on work stream analysis.
 
 ## Usage
 ```
@@ -15,9 +15,9 @@ Begin work on a GitHub issue with parallel agents based on work stream analysis.
 
 1. **Get issue details:**
    ```bash
-   gh issue view $ARGUMENTS --json state,title,labels,body
+   glab issue view $ARGUMENTS --json state,title,labels,body
    ```
-   If it fails: "❌ Cannot access issue #$ARGUMENTS. Check number or run: gh auth login"
+   If it fails: "❌ Cannot access issue #$ARGUMENTS. Check number or run: glab auth login"
 
 2. **Find local task file:**
    - First check if `.claude/epics/*/$ARGUMENTS.md` exists (new naming)
@@ -123,11 +123,11 @@ Task:
     Complete your stream's work and mark as completed when done.
 ```
 
-### 5. GitHub Assignment
+### 5. GitLab Assignment
 
 ```bash
 # Assign to self and mark in-progress
-gh issue edit $ARGUMENTS --add-assignee @me --add-label "in-progress"
+glab issue edit $ARGUMENTS --add-assignee @me --add-label "in-progress"
 ```
 
 ### 6. Output
@@ -160,4 +160,4 @@ If any step fails, report clearly:
 ## Important Notes
 
 Follow `/rules/datetime.md` for timestamps.
-Keep it simple - trust that GitHub and file system work.
+Keep it simple - trust that GitLab and file system work.

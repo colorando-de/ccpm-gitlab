@@ -38,14 +38,14 @@ Update epic.md:
 - Apply user's edits to content
 - Update `updated` field with current datetime
 
-### 4. Option to Update GitHub
+### 4. Option to Update GitLab
 
-If epic has GitHub URL in frontmatter:
-Ask: "Update GitHub issue? (yes/no)"
+If epic has GitLab URL in frontmatter:
+Ask: "Update GitLab issue? (yes/no)"
 
 If yes:
 ```bash
-gh issue edit {issue_number} --body-file .claude/epics/$ARGUMENTS/epic.md
+glab issue edit {issue_number} --description-file .claude/epics/$ARGUMENTS/epic.md
 ```
 
 ### 5. Output
@@ -54,7 +54,7 @@ gh issue edit {issue_number} --body-file .claude/epics/$ARGUMENTS/epic.md
 ✅ Updated epic: $ARGUMENTS
   Changes made to: {sections_edited}
   
-{If GitHub updated}: GitHub issue updated ✅
+{If GitLab updated}: GitLab issue updated ✅
 
 View epic: /pm:epic-show $ARGUMENTS
 ```

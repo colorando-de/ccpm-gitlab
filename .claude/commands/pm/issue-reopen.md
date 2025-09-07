@@ -35,7 +35,7 @@ If progress file exists:
 - Reset completion to previous value or 0%
 - Add note about reopening with reason
 
-### 4. Reopen on GitHub
+### 4. Reopen on GitLab
 
 ```bash
 # Reopen with comment
@@ -44,10 +44,10 @@ echo "🔄 Reopening issue
 Reason: $ARGUMENTS
 
 ---
-Reopened at: {timestamp}" | gh issue comment $ARGUMENTS --body-file -
+Reopened at: {timestamp}" | glab issue comment $ARGUMENTS --description-file -
 
 # Reopen the issue
-gh issue reopen $ARGUMENTS
+glab issue reopen $ARGUMENTS
 ```
 
 ### 5. Update Epic Progress

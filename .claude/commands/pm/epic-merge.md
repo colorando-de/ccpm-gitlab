@@ -136,7 +136,7 @@ mv .claude/epics/$ARGUMENTS .claude/epics/archived/
 echo "✅ Epic archived: .claude/epics/archived/$ARGUMENTS"
 ```
 
-### 7. Update GitHub Issues
+### 7. Update GitLab Issues
 
 Close related issues:
 ```bash
@@ -144,13 +144,13 @@ Close related issues:
 epic_issue=$(grep 'github:' .claude/epics/archived/$ARGUMENTS/epic.md | grep -oE '[0-9]+$')
 
 # Close epic issue
-gh issue close $epic_issue -c "Epic completed and merged to main"
+glab issue close $epic_issue -c "Epic completed and merged to main"
 
 # Close task issues
 for task_file in .claude/epics/archived/$ARGUMENTS/[0-9]*.md; do
   issue_num=$(grep 'github:' $task_file | grep -oE '[0-9]+$')
   if [ ! -z "$issue_num" ]; then
-    gh issue close $issue_num -c "Completed in epic merge"
+    glab issue close $issue_num -c "Completed in epic merge"
   fi
 done
 ```
@@ -170,7 +170,7 @@ Cleanup completed:
   ✓ Worktree removed
   ✓ Branch deleted
   ✓ Epic archived
-  ✓ GitHub issues closed
+  ✓ GitLab issues closed
   
 Next steps:
   - Deploy changes if needed
@@ -208,4 +208,4 @@ Or abort and try later:
 - Run tests before merging when possible
 - Use --no-ff to preserve epic history
 - Archive epic data instead of deleting
-- Close GitHub issues to maintain sync
+- Close GitLab issues to maintain sync

@@ -4,7 +4,7 @@ allowed-tools: Bash, Read, Write, LS, Task
 
 # Epic Sync
 
-Push epic and tasks to GitHub as issues.
+Push epic and tasks to GitLab as issues.
 
 ## Usage
 ```
@@ -27,26 +27,26 @@ If no tasks found: "❌ No tasks to sync. Run: /pm:epic-decompose $ARGUMENTS"
 
 ### 0. Check Remote Repository
 
-Follow `/rules/github-operations.md` to ensure we're not syncing to the CCPM template:
+Follow `/rules/gitlab-operations.md` to ensure we're not syncing to the CCPM template:
 
 ```bash
 # Check if remote origin is the CCPM template repository
 remote_url=$(git remote get-url origin 2>/dev/null || echo "")
-if [[ "$remote_url" == *"automazeio/ccpm"* ]] || [[ "$remote_url" == *"automazeio/ccpm.git"* ]]; then
+if [[ "$remote_url" == *"your-org/ccpm-gitlab"* ]] || [[ "$remote_url" == *"your-org/ccpm-gitlab.git"* ]]; then
   echo "❌ ERROR: You're trying to sync with the CCPM template repository!"
   echo ""
-  echo "This repository (automazeio/ccpm) is a template for others to use."
-  echo "You should NOT create issues or PRs here."
+  echo "This repository (your-org/ccpm-gitlab) is a template for others to use."
+  echo "You should NOT create issues or MRs here."
   echo ""
   echo "To fix this:"
-  echo "1. Fork this repository to your own GitHub account"
+  echo "1. Fork this repository to your own GitLab account"
   echo "2. Update your remote origin:"
-  echo "   git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+  echo "   git remote set-url origin https://gitlab.com/YOUR_USERNAME/YOUR_REPO.git"
   echo ""
   echo "Or if this is a new project:"
-  echo "1. Create a new repository on GitHub"
+  echo "1. Create a new repository on GitLab"
   echo "2. Update your remote origin:"
-  echo "   git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+  echo "   git remote set-url origin https://gitlab.com/YOUR_USERNAME/YOUR_REPO.git"
   echo ""
   echo "Current remote: $remote_url"
   exit 1
@@ -55,7 +55,7 @@ fi
 
 ### 1. Create Epic Issue
 
-Strip frontmatter and prepare GitHub issue body:
+Strip frontmatter and prepare GitLab issue body:
 ```bash
 # Extract content without frontmatter
 sed '1,/^---$/d; 1,/^---$/d' .claude/epics/$ARGUMENTS/epic.md > /tmp/epic-body-raw.md
@@ -107,11 +107,11 @@ else
 fi
 
 # Create epic issue with labels
-epic_number=$(gh issue create \
+epic_number=$(glab issue create \
   --title "Epic: $ARGUMENTS" \
-  --body-file /tmp/epic-body.md \
+  --description-file /tmp/epic-body.md \
   --label "epic,epic:$ARGUMENTS,$epic_type" \
-  --json number -q .number)
+  --json iid -q .iid)
 ```
 
 Store the returned issue number for epic frontmatter update.
@@ -120,7 +120,7 @@ Store the returned issue number for epic frontmatter update.
 
 Check if gh-sub-issue is available:
 ```bash
-if gh extension list | grep -q "yahsan2/gh-sub-issue"; then
+if glab extension list | grep -q "yahsan2/gh-sub-issue"; then
   use_subissues=true
 else
   use_subissues=false
@@ -149,18 +149,18 @@ if [ "$task_count" -lt 5 ]; then
 
     # Create sub-issue with labels
     if [ "$use_subissues" = true ]; then
-      task_number=$(gh sub-issue create \
+      task_number=$(glab issue create \
         --parent "$epic_number" \
         --title "$task_name" \
-        --body-file /tmp/task-body.md \
+        --description-file /tmp/task-body.md \
         --label "task,epic:$ARGUMENTS" \
-        --json number -q .number)
+        --json iid -q .iid)
     else
-      task_number=$(gh issue create \
+      task_number=$(glab issue create \
         --title "$task_name" \
-        --body-file /tmp/task-body.md \
+        --description-file /tmp/task-body.md \
         --label "task,epic:$ARGUMENTS" \
-        --json number -q .number)
+        --json iid -q .iid)
     fi
 
     # Record mapping for renaming
@@ -179,10 +179,10 @@ if [ "$task_count" -ge 5 ]; then
   echo "Creating $task_count sub-issues in parallel..."
 
   # Check if gh-sub-issue is available for parallel agents
-  if gh extension list | grep -q "yahsan2/gh-sub-issue"; then
-    subissue_cmd="gh sub-issue create --parent $epic_number"
+  if glab extension list | grep -q "yahsan2/gh-sub-issue"; then
+    subissue_cmd="glab issue create --parent $epic_number"
   else
-    subissue_cmd="gh issue create"
+    subissue_cmd="glab issue create"
   fi
 
   # Batch tasks for parallel processing
@@ -194,10 +194,10 @@ fi
 Use Task tool for parallel creation:
 ```yaml
 Task:
-  description: "Create GitHub sub-issues batch {X}"
+  description: "Create GitLab sub-issues batch {X}"
   subagent_type: "general-purpose"
   prompt: |
-    Create GitHub sub-issues for tasks in epic $ARGUMENTS
+    Create GitLab sub-issues for tasks in epic $ARGUMENTS
     Parent epic issue: #$epic_number
 
     Tasks to process:
@@ -208,10 +208,10 @@ Task:
     2. Strip frontmatter using: sed '1,/^---$/d; 1,/^---$/d'
     3. Create sub-issue using:
        - If gh-sub-issue available:
-         gh sub-issue create --parent $epic_number --title "$task_name" \
-           --body-file /tmp/task-body.md --label "task,epic:$ARGUMENTS"
+         glab issue create --parent $epic_number --title "$task_name" \
+           --description-file /tmp/task-body.md --label "task,epic:$ARGUMENTS"
        - Otherwise:
-         gh issue create --title "$task_name" --body-file /tmp/task-body.md \
+         glab issue create --title "$task_name" --description-file /tmp/task-body.md \
            --label "task,epic:$ARGUMENTS"
     4. Record: task_file:issue_number
 
@@ -266,11 +266,11 @@ while IFS=: read -r task_file task_number; do
   [ "$task_file" != "$new_name" ] && rm "$task_file"
 
   # Update github field in frontmatter
-  # Add the GitHub URL to the frontmatter
-  repo=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-  github_url="https://github.com/$repo/issues/$task_number"
+  # Add the GitLab URL to the frontmatter
+  repo=$(glab repo view --json nameWithOwner -q .nameWithOwner)
+  github_url="https://gitlab.com/$repo/issues/$task_number"
 
-  # Update frontmatter with GitHub URL and current timestamp
+  # Update frontmatter with GitLab URL and current timestamp
   current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
   # Use sed to update the github and updated fields
@@ -287,7 +287,7 @@ If NOT using gh-sub-issue, add task list to epic:
 ```bash
 if [ "$use_subissues" = false ]; then
   # Get current epic body
-  gh issue view {epic_number} --json body -q .body > /tmp/epic-body.md
+  glab issue view {epic_number} --json body -q .body > /tmp/epic-body.md
 
   # Append task list
   cat >> /tmp/epic-body.md << 'EOF'
@@ -299,7 +299,7 @@ if [ "$use_subissues" = false ]; then
   EOF
 
   # Update epic issue
-  gh issue edit {epic_number} --body-file /tmp/epic-body.md
+  glab issue edit {epic_number} --description-file /tmp/epic-body.md
 fi
 ```
 
@@ -307,13 +307,13 @@ With gh-sub-issue, this is automatic!
 
 ### 5. Update Epic File
 
-Update the epic file with GitHub URL, timestamp, and real task IDs:
+Update the epic file with GitLab URL, timestamp, and real task IDs:
 
 #### 5a. Update Frontmatter
 ```bash
 # Get repo info
-repo=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-epic_url="https://github.com/$repo/issues/$epic_number"
+repo=$(glab repo view --json nameWithOwner -q .nameWithOwner)
+epic_url="https://gitlab.com/$repo/issues/$epic_number"
 current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Update epic frontmatter
@@ -384,9 +384,9 @@ Create `.claude/epics/$ARGUMENTS/github-mapping.md`:
 ```bash
 # Create mapping file
 cat > .claude/epics/$ARGUMENTS/github-mapping.md << EOF
-# GitHub Issue Mapping
+# GitLab Issue Mapping
 
-Epic: #${epic_number} - https://github.com/${repo}/issues/${epic_number}
+Epic: #${epic_number} - https://gitlab.com/${repo}/issues/${epic_number}
 
 Tasks:
 EOF
@@ -398,7 +398,7 @@ for task_file in .claude/epics/$ARGUMENTS/[0-9]*.md; do
   issue_num=$(basename "$task_file" .md)
   task_name=$(grep '^name:' "$task_file" | sed 's/^name: *//')
 
-  echo "- #${issue_num}: ${task_name} - https://github.com/${repo}/issues/${issue_num}" >> .claude/epics/$ARGUMENTS/github-mapping.md
+  echo "- #${issue_num}: ${task_name} - https://gitlab.com/${repo}/issues/${issue_num}" >> .claude/epics/$ARGUMENTS/github-mapping.md
 done
 
 # Add sync timestamp
@@ -424,7 +424,7 @@ echo "✅ Created worktree: ../epic-$ARGUMENTS"
 ### 8. Output
 
 ```
-✅ Synced to GitHub
+✅ Synced to GitLab
   - Epic: #{epic_number} - {epic_title}
   - Tasks: {count} sub-issues created
   - Labels applied: epic, task, epic:{name}
@@ -435,12 +435,12 @@ echo "✅ Created worktree: ../epic-$ARGUMENTS"
 Next steps:
   - Start parallel execution: /pm:epic-start $ARGUMENTS
   - Or work on single issue: /pm:issue-start {issue_number}
-  - View epic: https://github.com/{owner}/{repo}/issues/{epic_number}
+  - View epic: https://gitlab.com/{owner}/{repo}/issues/{epic_number}
 ```
 
 ## Error Handling
 
-Follow `/rules/github-operations.md` for GitHub CLI errors.
+Follow `/rules/gitlab-operations.md` for GitLab CLI errors.
 
 If any issue creation fails:
 - Report what succeeded
@@ -449,7 +449,7 @@ If any issue creation fails:
 
 ## Important Notes
 
-- Trust GitHub CLI authentication
+- Trust GitLab CLI authentication
 - Don't pre-check for duplicates
 - Update frontmatter only after successful creation
 - Keep operations simple and atomic

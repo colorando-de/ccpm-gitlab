@@ -1,10 +1,10 @@
 # Strip Frontmatter
 
-Standard approach for removing YAML frontmatter before sending content to GitHub.
+Standard approach for removing YAML frontmatter before sending content to GitLab.
 
 ## The Problem
 
-YAML frontmatter contains internal metadata that should not appear in GitHub issues:
+YAML frontmatter contains internal metadata that should not appear in GitLab issues:
 - status, created, updated fields
 - Internal references and IDs
 - Local file paths
@@ -26,7 +26,7 @@ This removes:
 ## When to Strip Frontmatter
 
 Always strip frontmatter when:
-- Creating GitHub issues from markdown files
+- Creating GitLab issues from markdown files
 - Posting file content as comments
 - Displaying content to external users
 - Syncing to any external system
@@ -36,18 +36,18 @@ Always strip frontmatter when:
 ### Creating an issue from a file
 ```bash
 # Bad - includes frontmatter
-gh issue create --body-file task.md
+glab issue create --description-file task.md
 
 # Good - strips frontmatter
 sed '1,/^---$/d; 1,/^---$/d' task.md > /tmp/clean.md
-gh issue create --body-file /tmp/clean.md
+glab issue create --description-file /tmp/clean.md
 ```
 
 ### Posting a comment
 ```bash
 # Strip frontmatter before posting
 sed '1,/^---$/d; 1,/^---$/d' progress.md > /tmp/comment.md
-gh issue comment 123 --body-file /tmp/comment.md
+glab issue comment 123 --description-file /tmp/comment.md
 ```
 
 ### In a loop
