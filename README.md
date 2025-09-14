@@ -220,6 +220,9 @@ Specialized agents implement tasks while maintaining progress updates and an aud
 - `/pm:epic-close` - Mark epic as complete
 - `/pm:epic-edit` - Edit epic details
 - `/pm:epic-refresh` - Update epic progress from tasks
+- `/pm:epic-mr` - Create merge request for epic branch
+- `/pm:epic-merge` - Merge epic to main (or cleanup after MR)
+- `/pm:epic-cleanup` - Clean up worktree after merged MR
 
 ### Issue Commands
 - `/pm:issue-show` - Display issue and sub-issues

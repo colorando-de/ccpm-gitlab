@@ -24,7 +24,41 @@ Merge completed epic from worktree back to main branch.
 
 ## Instructions
 
-### 1. Pre-Merge Validation
+### 1. Check for Existing Merge Request
+
+Check if an MR exists for this epic:
+```bash
+# Check for open MR
+existing_mr=$(glab mr list --source-branch="epic/$ARGUMENTS" --state=opened --json | grep -o '"iid":[0-9]*' | head -1 | cut -d: -f2)
+
+if [ ! -z "$existing_mr" ]; then
+  echo "ℹ️ Open merge request found: !$existing_mr"
+  echo ""
+  echo "Options:"
+  echo "1. Merge the MR through GitLab UI first, then run this command for cleanup"
+  echo "2. Close the MR and proceed with direct merge (not recommended)"
+  echo ""
+  echo "To view MR: glab mr view $existing_mr"
+  echo ""
+  read -p "Continue with direct merge anyway? (yes/no): " response
+  if [ "$response" != "yes" ]; then
+    echo "Aborted. Please handle the MR first."
+    exit 0
+  fi
+fi
+
+# Check for merged MR
+merged_mr=$(glab mr list --source-branch="epic/$ARGUMENTS" --state=merged --json | grep -o '"iid":[0-9]*' | head -1 | cut -d: -f2)
+
+if [ ! -z "$merged_mr" ]; then
+  echo "✅ Merge request !$merged_mr was already merged"
+  echo "Proceeding with local cleanup..."
+  # Skip to cleanup section
+  SKIP_MERGE=true
+fi
+```
+
+### 2. Pre-Merge Validation
 
 Navigate to worktree and check status:
 ```bash
@@ -43,7 +77,7 @@ git fetch origin
 git status -sb
 ```
 
-### 2. Run Tests (Optional but Recommended)
+### 3. Run Tests (Optional but Recommended)
 
 ```bash
 # Look for test commands
@@ -54,7 +88,7 @@ elif [ -f Makefile ]; then
 fi
 ```
 
-### 3. Update Epic Documentation
+### 4. Update Epic Documentation
 
 Get current datetime: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
 
@@ -63,19 +97,21 @@ Update `.claude/epics/$ARGUMENTS/epic.md`:
 - Update completion date
 - Add final summary
 
-### 4. Attempt Merge
+### 5. Attempt Merge
 
 ```bash
-# Return to main repository
-cd {main-repo-path}
+# Skip if MR was already merged
+if [ "$SKIP_MERGE" != "true" ]; then
+  # Return to main repository
+  cd {main-repo-path}
 
-# Ensure main is up to date
-git checkout main
-git pull origin main
+  # Ensure main is up to date
+  git checkout main
+  git pull origin main
 
-# Attempt merge
-echo "Merging epic/$ARGUMENTS to main..."
-git merge epic/$ARGUMENTS --no-ff -m "Merge epic: $ARGUMENTS
+  # Attempt merge
+  echo "Merging epic/$ARGUMENTS to main..."
+  git merge epic/$ARGUMENTS --no-ff -m "Merge epic: $ARGUMENTS
 
 Completed features:
 $(cd .claude/epics/$ARGUMENTS && ls *.md | grep -E '^[0-9]+' | while read f; do
@@ -83,9 +119,12 @@ $(cd .claude/epics/$ARGUMENTS && ls *.md | grep -E '^[0-9]+' | while read f; do
 done)
 
 Closes epic #$(grep 'github:' .claude/epics/$ARGUMENTS/epic.md | grep -oE '#[0-9]+')"
+else
+  echo "✅ Skipping merge (already merged via MR)"
+fi
 ```
 
-### 5. Handle Merge Conflicts
+### 6. Handle Merge Conflicts
 
 If merge fails with conflicts:
 ```bash
@@ -115,12 +154,14 @@ Worktree preserved at: ../epic-$ARGUMENTS
 exit 1
 ```
 
-### 6. Post-Merge Cleanup
+### 7. Post-Merge Cleanup
 
-If merge succeeds:
+If merge succeeds or MR was merged:
 ```bash
-# Push to remote
-git push origin main
+# Push to remote (only if we did a local merge)
+if [ "$SKIP_MERGE" != "true" ]; then
+  git push origin main
+fi
 
 # Clean up worktree
 git worktree remove ../epic-$ARGUMENTS
@@ -136,7 +177,7 @@ mv .claude/epics/$ARGUMENTS .claude/epics/archived/
 echo "✅ Epic archived: .claude/epics/archived/$ARGUMENTS"
 ```
 
-### 7. Update GitLab Issues
+### 8. Update GitLab Issues
 
 Close related issues:
 ```bash
@@ -155,7 +196,7 @@ for task_file in .claude/epics/archived/$ARGUMENTS/[0-9]*.md; do
 done
 ```
 
-### 8. Final Output
+### 9. Final Output
 
 ```
 ✅ Epic Merged Successfully: $ARGUMENTS
@@ -205,6 +246,8 @@ Or abort and try later:
 ## Important Notes
 
 - Always check for uncommitted changes first
+- Check for existing merge requests before direct merge
+- Prefer using `/pm:epic-mr` to create an MR first
 - Run tests before merging when possible
 - Use --no-ff to preserve epic history
 - Archive epic data instead of deleting
