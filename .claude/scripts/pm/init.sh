@@ -113,11 +113,62 @@ else
   echo "  Initialize with: git init"
 fi
 
+# Detect project type
+PROJECT_TYPE="generic"
+if [ -f "artisan" ] && [ -f "composer.json" ]; then
+  if grep -q "laravel/framework" composer.json 2>/dev/null; then
+    PROJECT_TYPE="laravel"
+    echo ""
+    echo "🎼 Laravel project detected!"
+  fi
+fi
+
 # Create CLAUDE.md if it doesn't exist
 if [ ! -f "CLAUDE.md" ]; then
   echo ""
   echo "📄 Creating CLAUDE.md..."
-  cat > CLAUDE.md << 'EOF'
+
+  if [ "$PROJECT_TYPE" = "laravel" ]; then
+    cat > CLAUDE.md << 'EOF'
+# CLAUDE.md
+
+> Think carefully and implement the most concise solution that changes as little code as possible.
+
+## Project-Specific Instructions
+
+This is a Laravel project. Always check for laravel-boost MCP tools when available.
+
+## Testing
+
+Always run tests before committing:
+- `php artisan test` for PHPUnit tests
+- `php artisan test --parallel` for faster execution
+- Use `php artisan tinker` for quick validation
+
+## Database
+
+- Use migrations: `php artisan migrate`
+- Never modify database directly
+- Use seeders for test data: `php artisan db:seed`
+
+## Code Style
+
+- Follow PSR-12 coding standards
+- Use Laravel's built-in helpers and facades
+- Implement repository pattern for complex queries
+- Use form requests for validation
+- Follow existing patterns in the codebase
+
+## Cache Management
+
+After configuration changes:
+- `php artisan config:clear`
+- `php artisan cache:clear`
+- `php artisan route:clear`
+- `php artisan view:clear`
+EOF
+  else
+    cat > CLAUDE.md << 'EOF'
 # CLAUDE.md
 
 > Think carefully and implement the most concise solution that changes as little code as possible.
@@ -135,6 +186,7 @@ Always run tests before committing:
 
 Follow existing patterns in the codebase.
 EOF
+  fi
   echo "  ✅ CLAUDE.md created"
 fi
 

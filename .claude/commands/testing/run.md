@@ -34,12 +34,24 @@ test -f "$ARGUMENTS" || echo "⚠️ Test file not found: $ARGUMENTS"
 
 ### 1. Determine Test Command
 
-Based on testing-config.md and target:
-- No arguments → Run full test suite from config
-- File path → Run specific test file
-- Pattern → Run tests matching pattern
+Check for Laravel project first:
+```bash
+if [ -f "artisan" ]; then
+    IS_LARAVEL=true
+fi
+```
+
+Based on project type and target:
+- Laravel + no arguments → `php artisan test`
+- Laravel + file path → `php artisan test [file]`
+- Laravel + pattern → `php artisan test --filter [pattern]`
+- Other projects → Use testing-config.md settings
 
 ### 2. Execute Tests
+
+For Laravel projects, check for MCP first:
+- If `mcp__laravel-boost__test` available, use it
+- Otherwise use artisan commands
 
 Use the test-runner agent from `.claude/agents/test-runner.md`:
 
@@ -47,10 +59,13 @@ Use the test-runner agent from `.claude/agents/test-runner.md`:
 Execute tests for: $ARGUMENTS (or "all" if empty)
 
 Requirements:
+- Detect project type (Laravel vs other)
+- Check for laravel-boost MCP if Laravel
 - Run with verbose output for debugging
 - No mocks - use real services
 - Capture full output including stack traces
 - If test fails, check test structure before assuming code issue
+- For Laravel: use php artisan test commands
 ```
 
 ### 3. Monitor Execution

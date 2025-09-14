@@ -13,6 +13,13 @@ Do not bother the user with preflight checks progress ("I'm not going to ..."). 
 
 ### 1. Test Framework Detection
 
+**Laravel/PHP (Check First):**
+- Check for Laravel: `test -f artisan && grep -q "laravel/framework" composer.json 2>/dev/null`
+- Check for PHPUnit: `test -f phpunit.xml -o -f phpunit.xml.dist`
+- Check for Pest: `grep -q "pestphp/pest" composer.json 2>/dev/null`
+- Check test directory: `test -d tests && ls tests/`
+- Check for laravel-boost MCP availability
+
 **JavaScript/Node.js:**
 - Check package.json for test scripts: `grep -E '"test"|"spec"|"jest"|"mocha"' package.json 2>/dev/null`
 - Look for test config files: `ls -la jest.config.* mocha.opts .mocharc.* 2>/dev/null`
@@ -45,6 +52,7 @@ If no test framework detected:
 ### 3. Dependency Check
 
 **For detected framework:**
+- Laravel/PHP: Run `composer show | grep -E "phpunit|pest"` and check `php -v`
 - Node.js: Run `npm list --depth=0 2>/dev/null | grep -E "jest|mocha|chai|jasmine"`
 - Python: Run `pip list 2>/dev/null | grep -E "pytest|unittest|nose"`
 - Verify test dependencies are installed
@@ -58,6 +66,34 @@ If dependencies missing:
 ### 1. Framework-Specific Configuration
 
 Based on detected framework, create test configuration:
+
+#### Laravel/PHP (PHPUnit)
+```yaml
+framework: phpunit
+test_command: php artisan test
+test_directory: tests
+config_file: phpunit.xml
+options:
+  - --verbose
+  - --stop-on-failure
+environment:
+  APP_ENV: testing
+mcp_available: laravel-boost  # If detected
+```
+
+#### Laravel/PHP (Pest)
+```yaml
+framework: pest
+test_command: php artisan test
+test_directory: tests
+config_file: phpunit.xml
+options:
+  - --parallel
+  - --verbose
+environment:
+  APP_ENV: testing
+mcp_available: laravel-boost  # If detected
+```
 
 #### JavaScript/Node.js (Jest)
 ```yaml
